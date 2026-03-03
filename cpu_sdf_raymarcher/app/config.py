@@ -33,10 +33,10 @@ class ParserLike(Protocol):
         """Report/raise argument validation error.
 
         Args:
-            message (str): Message value.
+            message (str): Validation message passed to parser.error.
 
         Returns:
-            Any: Computed value.
+            Any: Parser-specific result; many implementations raise and do not return.
         """
         ...
 
@@ -69,10 +69,10 @@ def parse_args(
 
     Args:
         argv (Optional[Sequence[str]]): Optional CLI arguments.
-        qt_available (bool): Qt available value.
+        qt_available (bool): Whether the PySide6 GUI stack is available in the runtime.
 
     Returns:
-        argparse.Namespace: Computed value.
+        argparse.Namespace: Parsed CLI arguments with quality defaults applied.
     """
     parser = argparse.ArgumentParser(description="CPU SDF ray-marching renderer.")
 
@@ -176,7 +176,7 @@ def validate_args(args: argparse.Namespace, parser: ParserLike, *, qt_available:
     Args:
         args (argparse.Namespace): Parsed application arguments.
         parser (ParserLike): Parser-like object used to report validation errors.
-        qt_available (bool): Qt available value.
+        qt_available (bool): Whether the PySide6 GUI stack is available in the runtime.
 
     Returns:
         None: This function does not return a value.
@@ -240,3 +240,4 @@ def validate_args(args: argparse.Namespace, parser: ParserLike, *, qt_available:
     out_lower = args.output.lower()
     if not out_lower.endswith(".png"):
         parser.error("--output must end with .png.")
+

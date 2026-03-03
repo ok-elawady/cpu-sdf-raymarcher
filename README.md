@@ -2,37 +2,38 @@
 
 This project is a CPU-based ray-marching renderer with a simple PySide6 GUI.
 
+Repository name uses hyphens (`cpu-sdf-raymarcher`) while the Python package uses underscores (`cpu_sdf_raymarcher`).
+
 ## Project Structure
 
 ```text
-P2-3/
-  launch_gui.bat         # main launcher (creates venv, installs deps, opens GUI)
-  run_app.py              # optional compatibility launcher
-  cpu_sdf_raymarcher/     # app package
+launch_gui.bat          # main launcher (creates venv, installs deps, opens GUI)
+run_app.py              # optional compatibility launcher
+cpu_sdf_raymarcher/     # app package
+  __init__.py
+  __main__.py
+  app/
     __init__.py
-    __main__.py
-    app/
-      __init__.py
-      cli.py
-      config.py
-      gui.py
-    engine/
-      __init__.py
-      constants.py
-      core.py
-    common/
-      __init__.py
-      color_utils.py
-      math_utils.py
-      types.py
-  docs/
-    images/
-      P2-3-GUI.png
-      P2-3-output.png
-  tests/
-  pytest.ini
-  requirements.txt
-  README.md
+    cli.py
+    config.py
+    gui.py
+  engine/
+    __init__.py
+    constants.py
+    core.py
+  common/
+    __init__.py
+    color_utils.py
+    math_utils.py
+    types.py
+docs/
+  images/
+    GUI.png
+    output.png
+tests/
+pytest.ini
+requirements.txt
+README.md
 ```
 
 ## Requirements
@@ -47,6 +48,8 @@ Main way (recommended):
 ```powershell
 .\launch_gui.bat
 ```
+
+Note: `launch_gui.bat` is for Windows (PowerShell/CMD). On macOS/Linux, use `python -m cpu_sdf_raymarcher --gui`.
 
 What this does:
 - Creates `.venv` if missing
@@ -71,6 +74,12 @@ Parallel render example (auto cores):
 
 ```powershell
 python -m cpu_sdf_raymarcher --quality high --workers 0 --output render-fast.png
+```
+
+## Testing
+
+```powershell
+python -m pytest -q
 ```
 
 ## CLI Options
@@ -99,11 +108,11 @@ python -m cpu_sdf_raymarcher --quality high --workers 0 --output render-fast.png
 
 GUI:
 
-![GUI Screenshot](docs/images/P2-3-GUI.png)
+![GUI Screenshot](docs/images/GUI.png)
 
 Rendered output:
 
-![Render Output](docs/images/P2-3-output.png)
+![Render Output](docs/images/output.png)
 
 Notes:
 - Running with no arguments opens the GUI by default.
@@ -114,8 +123,6 @@ Notes:
 - Wheel sub-shapes share the same `--torus-color` for a simpler interface.
 - GUI color rows show both formats for readability: `#RRGGBB (R, G, B)`.
 
-
-
 ## Future Work
 
 - [ ] **Performance:** Profile the render loop and optimize the most expensive SDF/shading paths.
@@ -125,5 +132,9 @@ Notes:
 
 ## Acknowledgment
 
-This project started as a final task for the **Mathematics 1** course in the **Computer Graphics TD Track** of the **ITI Egypt 9-Month Intensive Program**.
+This project started as a final task for the **Mathematics 1** course in the **CG TD Track** of the **ITI Egypt 9-Month Intensive Program**.
 It was later extended as a personal practice project.
+
+
+
+

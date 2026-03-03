@@ -44,10 +44,10 @@ def sd_plane(p: Vec3) -> float:
     """Signed distance to plane y = -1 (positive above plane).
 
     Args:
-        p (Vec3): P value.
+        p (Vec3): Query point in world space.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     return p[1] + 1.0
 
@@ -56,12 +56,12 @@ def sd_sphere(p: Vec3, c: Vec3, r: float) -> float:
     """Signed distance to sphere centered at c with radius r.
 
     Args:
-        p (Vec3): P value.
-        c (Vec3): C value.
-        r (float): R value.
+        p (Vec3): Query point in world space.
+        c (Vec3): Primitive center in world space.
+        r (float): Primitive radius.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     return length(sub(p, c)) - r
 
@@ -70,12 +70,12 @@ def sd_box(p: Vec3, c: Vec3, b: Vec3) -> float:
     """Signed distance to axis-aligned box (center c, half-extents b).
 
     Args:
-        p (Vec3): P value.
-        c (Vec3): C value.
-        b (Vec3): B value.
+        p (Vec3): Query point in world space.
+        c (Vec3): Primitive center in world space.
+        b (Vec3): Box half-extents along X, Y, and Z.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     q = sub(p, c)
     qx = abs(q[0]) - b[0]
@@ -96,12 +96,12 @@ def sd_torus(p: Vec3, c: Vec3, t: Tuple[float, float]) -> float:
     """Distance to classic torus around Y axis: t=(major_radius, minor_radius).
 
     Args:
-        p (Vec3): P value.
-        c (Vec3): C value.
-        t (Tuple[float, float]): T value.
+        p (Vec3): Query point in world space.
+        c (Vec3): Primitive center in world space.
+        t (Tuple[float, float]): Torus radii as (major_radius, minor_radius).
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     q = sub(p, c)
     x = length2((q[0], q[2])) - t[0]
@@ -112,12 +112,12 @@ def sd_torus82(p: Vec3, c: Vec3, t: Tuple[float, float]) -> float:
     """Distance to 'boxier' torus variant using L^8 norm in cross section.
 
     Args:
-        p (Vec3): P value.
-        c (Vec3): C value.
-        t (Tuple[float, float]): T value.
+        p (Vec3): Query point in world space.
+        c (Vec3): Primitive center in world space.
+        t (Tuple[float, float]): Torus radii as (major_radius, minor_radius).
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     q = sub(p, c)
     x = length2((q[0], q[2])) - t[0]
@@ -128,14 +128,14 @@ def sd_capped_cone(p: Vec3, c: Vec3, h: float, r1: float, r2: float) -> float:
     """Distance to a finite cone frustum capped at both ends.
 
     Args:
-        p (Vec3): P value.
-        c (Vec3): C value.
-        h (float): H value.
-        r1 (float): R1 value.
-        r2 (float): R2 value.
+        p (Vec3): Query point in world space.
+        c (Vec3): Primitive center in world space.
+        h (float): Half-height of the primitive.
+        r1 (float): Radius at the lower cap of the cone frustum.
+        r2 (float): Radius at the upper cap of the cone frustum.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     # Exact capped-cone SDF (axis: +Y, local range y in [-h, +h]).
     q = sub(p, c)
@@ -162,13 +162,13 @@ def sd_capped_cylinder(p: Vec3, c: Vec3, h: float, r: float) -> float:
     """Distance to finite vertical cylinder (center c, half-height h, radius r).
 
     Args:
-        p (Vec3): P value.
-        c (Vec3): C value.
-        h (float): H value.
-        r (float): R value.
+        p (Vec3): Query point in world space.
+        c (Vec3): Primitive center in world space.
+        h (float): Half-height of the primitive.
+        r (float): Primitive radius.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     q = sub(p, c)
     d = (length2((q[0], q[2])) - r, abs(q[1]) - h)
@@ -181,12 +181,12 @@ def smooth_union(d1: float, d2: float, k: float) -> float:
     """Blend two SDFs smoothly; larger k means softer transition.
 
     Args:
-        d1 (float): D1 value.
-        d2 (float): D2 value.
-        k (float): K value.
+        d1 (float): First signed-distance value to blend.
+        d2 (float): Second signed-distance value to blend.
+        k (float): Smoothing factor controlling blend softness.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     if k <= 0.0:
         return min(d1, d2)
@@ -198,10 +198,10 @@ def wheel_distance_and_material(p: Vec3) -> Tuple[float, int]:
     """Wheel is a smooth union of two torus profiles; return (distance, dominant material).
 
     Args:
-        p (Vec3): P value.
+        p (Vec3): Query point in world space.
 
     Returns:
-        Tuple[float, int]: Tuple containing computed values.
+        Tuple[float, int]: Pair of (distance, material_id).
     """
     d_torus = sd_torus(p, WHEEL_CENTER, TORUS_RADII)
     d_torus82 = sd_torus82(p, WHEEL_CENTER, TORUS82_RADII)
@@ -214,10 +214,10 @@ def map_objects(p: Vec3) -> Tuple[float, int]:
     """Return nearest object distance/material at point p.
 
     Args:
-        p (Vec3): P value.
+        p (Vec3): Query point in world space.
 
     Returns:
-        Tuple[float, int]: Tuple containing computed values.
+        Tuple[float, int]: Pair of (distance, material_id).
     """
     # Brute-force minimum across all finite objects in the scene.
     best_d = float("inf")
@@ -255,14 +255,14 @@ def march_objects(ro: Vec3, rd: Vec3, max_steps: int, max_dist: float, eps: floa
     """Sphere-tracing pass against finite objects only (no ground plane).
 
     Args:
-        ro (Vec3): Ro value.
-        rd (Vec3): Rd value.
-        max_steps (int): Max steps value.
-        max_dist (float): Max dist value.
-        eps (float): Eps value.
+        ro (Vec3): Ray origin in world space.
+        rd (Vec3): Normalized ray direction in world space.
+        max_steps (int): Maximum number of sphere-tracing iterations.
+        max_dist (float): Maximum travel distance allowed along the ray.
+        eps (float): Surface hit threshold epsilon.
 
     Returns:
-        Tuple[bool, float, int]: Tuple containing computed values.
+        Tuple[bool, float, int]: Tuple of (hit, distance, material_id).
     """
     t = 0.0
     for _ in range(max_steps):
@@ -282,11 +282,11 @@ def intersect_plane(ro: Vec3, rd: Vec3) -> Optional[float]:
     """Analytic intersection with the infinite ground plane y = -1.
 
     Args:
-        ro (Vec3): Ro value.
-        rd (Vec3): Rd value.
+        ro (Vec3): Ray origin in world space.
+        rd (Vec3): Normalized ray direction in world space.
 
     Returns:
-        Optional[float]: Computed value if available; otherwise None.
+        Optional[float]: Positive ray distance to the plane, or None if no forward hit.
     """
     denom = rd[1]
     if abs(denom) < 1e-12:
@@ -301,14 +301,14 @@ def trace_scene(ro: Vec3, rd: Vec3, max_steps: int, max_dist: float, eps: float)
     """Combine object marching + plane hit, then pick nearest valid hit.
 
     Args:
-        ro (Vec3): Ro value.
-        rd (Vec3): Rd value.
-        max_steps (int): Max steps value.
-        max_dist (float): Max dist value.
-        eps (float): Eps value.
+        ro (Vec3): Ray origin in world space.
+        rd (Vec3): Normalized ray direction in world space.
+        max_steps (int): Maximum number of sphere-tracing iterations.
+        max_dist (float): Maximum travel distance allowed along the ray.
+        eps (float): Surface hit threshold epsilon.
 
     Returns:
-        Tuple[bool, float, int]: Tuple containing computed values.
+        Tuple[bool, float, int]: Tuple of (hit, distance, material_id).
     """
     obj_hit, obj_t, obj_mat = march_objects(ro, rd, max_steps, max_dist, eps)
     plane_t = intersect_plane(ro, rd)
@@ -330,11 +330,11 @@ def distance_for_material(p: Vec3, mat_id: int) -> float:
     """Distance function for one specific material (used for normal estimation).
 
     Args:
-        p (Vec3): P value.
-        mat_id (int): Mat id value.
+        p (Vec3): Query point in world space.
+        mat_id (int): Material identifier for the hit primitive.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     if mat_id == MAT_PLANE:
         return sd_plane(p)
@@ -355,12 +355,12 @@ def estimate_normal(p: Vec3, eps: float, mat_id: int) -> Vec3:
     """Estimate geometric normal from SDF gradient with central differences.
 
     Args:
-        p (Vec3): P value.
-        eps (float): Eps value.
-        mat_id (int): Mat id value.
+        p (Vec3): Query point in world space.
+        eps (float): Surface hit threshold epsilon.
+        mat_id (int): Material identifier for the hit primitive.
 
     Returns:
-        Vec3: Computed value.
+        Vec3: Estimated unit surface normal.
     """
     if mat_id == MAT_PLANE:
         # Plane normal is constant, so avoid unnecessary sampling.
@@ -380,10 +380,10 @@ def scene_distance(p: Vec3) -> float:
     """Global SDF used by AO queries (objects + plane).
 
     Args:
-        p (Vec3): P value.
+        p (Vec3): Query point in world space.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     return min(sd_plane(p), map_objects(p)[0])
 
@@ -392,14 +392,14 @@ def calc_soft_shadow(ro: Vec3, rd: Vec3, t_min: float, t_max: float, shadow_step
     """Approximate soft shadow by secondary marching toward the key light.
 
     Args:
-        ro (Vec3): Ro value.
-        rd (Vec3): Rd value.
-        t_min (float): T min value.
-        t_max (float): T max value.
-        shadow_steps (int): Shadow steps value.
+        ro (Vec3): Ray origin in world space.
+        rd (Vec3): Normalized ray direction in world space.
+        t_min (float): Near distance bound along the shadow ray.
+        t_max (float): Far distance bound along the shadow ray.
+        shadow_steps (int): Maximum marching steps for the shadow ray.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     # March only against object SDF to avoid self-shadowing from the infinite plane.
     if shadow_steps <= 0:
@@ -423,12 +423,12 @@ def calc_ambient_occlusion(pos: Vec3, nor: Vec3, ao_samples: int) -> float:
     """Estimate ambient occlusion by probing along the surface normal.
 
     Args:
-        pos (Vec3): Pos value.
-        nor (Vec3): Nor value.
-        ao_samples (int): Ao samples value.
+        pos (Vec3): Surface position where AO is evaluated.
+        nor (Vec3): Surface normal used for AO sampling.
+        ao_samples (int): Number of ambient-occlusion probe samples.
 
     Returns:
-        float: Computed result.
+        float: Signed-distance or scalar result for this query.
     """
     if ao_samples <= 0:
         return 1.0
@@ -450,10 +450,10 @@ def material_spec(mat_id: int) -> Tuple[float, float]:
     """Material-specific highlight controls: (specular strength, shininess).
 
     Args:
-        mat_id (int): Mat id value.
+        mat_id (int): Material identifier for the hit primitive.
 
     Returns:
-        Tuple[float, float]: Tuple containing computed values.
+        Tuple[float, float]: (specular_strength, shininess).
     """
     # (spec_strength, shininess)
     if mat_id == MAT_PLANE:
@@ -475,10 +475,10 @@ def sky_color(rd: Vec3) -> Color:
     """Simple vertical sky gradient used for misses and fog tinting.
 
     Args:
-        rd (Vec3): Rd value.
+        rd (Vec3): Normalized ray direction in world space.
 
     Returns:
-        Color: Computed value.
+        Color: RGB color tuple in linear space, channels in [0, 1].
     """
     t = clamp(0.5 * (rd[1] + 1.0), 0.0, 1.0)
     return (
@@ -492,10 +492,10 @@ def gamma_correct(c: Color) -> Color:
     """Convert from linear color space to display-ish gamma space.
 
     Args:
-        c (Color): C value.
+        c (Color): Linear RGB color tuple in [0, 1].
 
     Returns:
-        Color: Computed value.
+        Color: RGB color tuple in linear space, channels in [0, 1].
     """
     inv_gamma = 1.0 / 2.2
     return (
@@ -509,10 +509,10 @@ def color_to_bytes(c: Color) -> Tuple[int, int, int]:
     """Convert normalized RGB [0..1] to 8-bit RGB [0..255].
 
     Args:
-        c (Color): C value.
+        c (Color): Linear RGB color tuple in [0, 1].
 
     Returns:
-        Tuple[int, int, int]: Tuple containing computed values.
+        Tuple[int, int, int]: 8-bit RGB tuple (0-255 per channel).
     """
     r = int(clamp(c[0], 0.0, 1.0) * 255.0 + 0.5)
     g = int(clamp(c[1], 0.0, 1.0) * 255.0 + 0.5)
@@ -534,18 +534,18 @@ def shade(
     """Compute final shaded color for one surface hit point.
 
     Args:
-        hit_point (Vec3): Hit point value.
-        mat_id (int): Mat id value.
-        rd (Vec3): Rd value.
-        mat_colors (Dict[int, Color]): Mat colors value.
-        eps (float): Eps value.
-        hit_dist (float): Hit dist value.
-        max_dist (float): Max dist value.
-        shadow_steps (int): Shadow steps value.
-        ao_samples (int): Ao samples value.
+        hit_point (Vec3): Surface point being shaded.
+        mat_id (int): Material identifier for the hit primitive.
+        rd (Vec3): Normalized ray direction in world space.
+        mat_colors (Dict[int, Color]): Material-to-color lookup table in linear RGB.
+        eps (float): Surface hit threshold epsilon.
+        hit_dist (float): Ray distance from camera to the hit point.
+        max_dist (float): Maximum travel distance allowed along the ray.
+        shadow_steps (int): Maximum marching steps for the shadow ray.
+        ao_samples (int): Number of ambient-occlusion probe samples.
 
     Returns:
-        Color: Computed value.
+        Color: RGB color tuple in linear space, channels in [0, 1].
     """
     # 1) Surface basis vectors.
     normal = estimate_normal(hit_point, eps * 2.0, mat_id)
@@ -624,10 +624,10 @@ def to_unit_color(rgb: Tuple[int, int, int]) -> Color:
     """Convert 8-bit RGB tuple into normalized float color.
 
     Args:
-        rgb (Tuple[int, int, int]): Rgb value.
+        rgb (Tuple[int, int, int]): 8-bit RGB tuple (0-255 per channel).
 
     Returns:
-        Color: Computed value.
+        Color: RGB color tuple in linear space, channels in [0, 1].
     """
     return (rgb[0] / 255.0, rgb[1] / 255.0, rgb[2] / 255.0)
 
@@ -639,7 +639,7 @@ def build_material_colors(args: Any) -> Dict[int, Color]:
         args (Any): Parsed application arguments.
 
     Returns:
-        Dict[int, Color]: Computed value.
+        Dict[int, Color]: Mapping from material id to linear RGB color.
     """
     return {
         MAT_PLANE: to_unit_color(tuple(args.plane_color)),
@@ -656,10 +656,10 @@ def resolve_worker_count(workers: int) -> int:
     """Resolve requested worker count (0 => auto).
 
     Args:
-        workers (int): Workers value.
+        workers (int): Requested process count (0 means auto-detect).
 
     Returns:
-        int: Computed result.
+        int: Resolved worker process count.
     """
     if workers <= 0:
         return max(1, int(os.cpu_count() or 1))
@@ -687,25 +687,25 @@ def render_row(
     """Render one scanline and return (row_index, row_rgb_bytes).
 
     Args:
-        y (int): y coordinate value.
-        width (int): Width input value.
-        height (int): Height input value.
-        aa (int): Aa value.
-        cam_pos (Vec3): Cam pos value.
-        right (Vec3): Right value.
-        cam_up (Vec3): Cam up value.
-        forward (Vec3): Forward value.
-        aspect (float): Aspect value.
-        scale (float): Scale value.
-        max_steps (int): Max steps value.
-        max_dist (float): Max dist value.
-        eps (float): Eps value.
-        shadow_steps (int): Shadow steps value.
-        ao_samples (int): Ao samples value.
-        mat_colors (Dict[int, Color]): Mat colors value.
+        y (int): Scanline index to render.
+        width (int): Output image width in pixels.
+        height (int): Output image height in pixels.
+        aa (int): Anti-aliasing grid size per axis (samples = aa * aa).
+        cam_pos (Vec3): Camera origin in world space.
+        right (Vec3): Camera right basis vector.
+        cam_up (Vec3): Camera up basis vector.
+        forward (Vec3): Camera forward basis vector.
+        aspect (float): View aspect ratio (width / height).
+        scale (float): Perspective scale derived from vertical field of view.
+        max_steps (int): Maximum number of sphere-tracing iterations.
+        max_dist (float): Maximum travel distance allowed along the ray.
+        eps (float): Surface hit threshold epsilon.
+        shadow_steps (int): Maximum marching steps for the shadow ray.
+        ao_samples (int): Number of ambient-occlusion probe samples.
+        mat_colors (Dict[int, Color]): Material-to-color lookup table in linear RGB.
 
     Returns:
-        Tuple[int, bytes]: Tuple containing computed values.
+        Tuple[int, bytes]: Tuple of (row_index, packed_row_rgb_bytes).
     """
     # AA uses an aa x aa regular grid of sub-pixel samples.
     sample_count = aa * aa
@@ -778,11 +778,11 @@ def render_image(
 
     Args:
         args (Any): Parsed application arguments.
-        row_callback (Optional[Callable[[int, bytearray, float], None]]): Row callback value.
-        disable_terminal_progress (bool): Disable terminal progress value.
+        row_callback (Optional[Callable[[int, bytearray, float], None]]): Optional callback invoked after each completed row.
+        disable_terminal_progress (bool): If True, suppress terminal progress output.
 
     Returns:
-        bytearray: Computed value.
+        bytearray: Packed RGB image buffer in row-major order.
     """
     # Pull frequently used args into locals for speed/readability.
     width = args.width
@@ -925,11 +925,11 @@ def png_chunk(chunk_type: bytes, data: bytes) -> bytes:
     """Build one PNG chunk with length/type/data/CRC.
 
     Args:
-        chunk_type (bytes): Chunk type value.
-        data (bytes): Data value.
+        chunk_type (bytes): Four-byte PNG chunk type (for example, IHDR or IDAT).
+        data (bytes): Raw chunk payload bytes.
 
     Returns:
-        bytes: Computed value.
+        bytes: PNG chunk bytes with length, type, payload, and CRC.
     """
     crc = zlib.crc32(chunk_type + data) & 0xFFFFFFFF
     return (
@@ -944,10 +944,10 @@ def write_png(path: str, width: int, height: int, pixels: bytearray) -> None:
     """Write RGB buffer as PNG using only stdlib (zlib + struct).
 
     Args:
-        path (str): Path input value.
-        width (int): Width input value.
-        height (int): Height input value.
-        pixels (bytearray): Pixels input value.
+        path (str): Output file path.
+        width (int): Output image width in pixels.
+        height (int): Output image height in pixels.
+        pixels (bytearray): Packed RGB pixel buffer (row-major, 3 bytes per pixel).
 
     Returns:
         None: This function does not return a value.
@@ -977,10 +977,10 @@ def write_image(path: str, width: int, height: int, pixels: bytearray) -> None:
     """Write rendered pixels as PNG.
 
     Args:
-        path (str): Path input value.
-        width (int): Width input value.
-        height (int): Height input value.
-        pixels (bytearray): Pixels input value.
+        path (str): Output file path.
+        width (int): Output image width in pixels.
+        height (int): Output image height in pixels.
+        pixels (bytearray): Packed RGB pixel buffer (row-major, 3 bytes per pixel).
 
     Returns:
         None: This function does not return a value.
@@ -989,4 +989,6 @@ def write_image(path: str, width: int, height: int, pixels: bytearray) -> None:
     if not lower.endswith(".png"):
         raise ValueError("Output extension must be .png.")
     write_png(path, width, height, pixels)
+
+
 

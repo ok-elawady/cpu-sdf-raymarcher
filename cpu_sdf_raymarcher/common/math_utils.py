@@ -107,7 +107,7 @@ def clamp(x: float, lo: float, hi: float) -> float:
     """Clamp value into [lo, hi].
 
     Args:
-        x (float): Input value.
+        x (float): Scalar to clamp.
         lo (float): Lower bound.
         hi (float): Upper bound.
 
@@ -125,8 +125,8 @@ def mix(a: float, b: float, t: float) -> float:
     """Linear interpolation.
 
     Args:
-        a (float): Start value.
-        b (float): End value.
+        a (float): Interpolation start value.
+        b (float): Interpolation end value.
         t (float): Blend factor in [0, 1].
 
     Returns:
@@ -157,4 +157,5 @@ def length8(v: Tuple[float, float]) -> float:
         float: L^8 norm.
     """
     return (abs(v[0]) ** 8.0 + abs(v[1]) ** 8.0) ** (1.0 / 8.0)
+
 

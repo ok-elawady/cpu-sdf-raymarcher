@@ -43,7 +43,7 @@ def has_qt() -> bool:
         None.
 
     Returns:
-        bool: Computed result.
+        bool: True when required PySide6 modules are available.
     """
     return QtWidgets is not None and QtCore is not None and QtGui is not None
 
@@ -167,9 +167,9 @@ class QtRenderWindow(_QtWidgetBase):
         """Create one row containing a color button and RGB text readout.
 
         Args:
-            attr_name (str): Attr name value.
-            label (str): Label value.
-            rgb (Tuple[int, int, int]): Rgb value.
+            attr_name (str): Namespace attribute key that stores this color.
+            label (str): Human-readable label used in the UI and validation messages.
+            rgb (Tuple[int, int, int]): RGB color tuple using 8-bit channel values.
 
         Returns:
             None: This function does not return a value.
@@ -194,9 +194,9 @@ class QtRenderWindow(_QtWidgetBase):
         """Apply selected RGB to both the swatch button and its text label.
 
         Args:
-            button (Any): Button value.
-            label (Any): Label value.
-            rgb (Tuple[int, int, int]): Rgb value.
+            button (Any): Qt button widget used as the color swatch.
+            label (Any): Qt label widget that shows hex and RGB text.
+            rgb (Tuple[int, int, int]): RGB color tuple using 8-bit channel values.
 
         Returns:
             None: This function does not return a value.
@@ -215,9 +215,9 @@ class QtRenderWindow(_QtWidgetBase):
         """Open Qt color picker and update stored/displayed value.
 
         Args:
-            attr_name (str): Attr name value.
-            button (Any): Button value.
-            label (Any): Label value.
+            attr_name (str): Namespace attribute key that stores this color.
+            button (Any): Qt button widget used as the color swatch.
+            label (Any): Qt label widget that shows hex and RGB text.
 
         Returns:
             None: This function does not return a value.
@@ -235,11 +235,11 @@ class QtRenderWindow(_QtWidgetBase):
         """Parse 'x,y,z' text into a numeric tuple with clear validation errors.
 
         Args:
-            text (str): Text value.
-            label (str): Label value.
+            text (str): Comma-separated vector text in the form x,y,z.
+            label (str): Human-readable label used in the UI and validation messages.
 
         Returns:
-            Tuple[float, float, float]: Tuple containing computed values.
+            Tuple[float, float, float]: Parsed vector components as floats.
         """
         parts = [p.strip() for p in text.split(",")]
         if len(parts) != 3:
@@ -256,7 +256,7 @@ class QtRenderWindow(_QtWidgetBase):
             None.
 
         Returns:
-            argparse.Namespace: Computed value.
+            argparse.Namespace: Render arguments assembled from current GUI controls.
         """
         args = argparse.Namespace(**vars(self.initial_args))
 
@@ -318,9 +318,9 @@ class QtRenderWindow(_QtWidgetBase):
         """Push current RGB buffer into QLabel preview.
 
         Args:
-            pixels (bytearray): Pixels input value.
-            width (int): Width input value.
-            height (int): Height input value.
+            pixels (bytearray): Packed RGB pixel buffer produced by the renderer.
+            width (int): Preview image width in pixels.
+            height (int): Preview image height in pixels.
 
         Returns:
             None: This function does not return a value.
@@ -333,9 +333,9 @@ class QtRenderWindow(_QtWidgetBase):
         """Row callback used by renderer to update progress + live preview.
 
         Args:
-            done_rows (int): Done rows value.
-            pixels (bytearray): Pixels input value.
-            start_time (float): Start time value.
+            done_rows (int): Number of scanlines completed so far.
+            pixels (bytearray): Packed RGB pixel buffer produced by the renderer.
+            start_time (float): Render start timestamp from time.perf_counter().
 
         Returns:
             None: This function does not return a value.
@@ -414,7 +414,7 @@ def run_pyside_gui(args: argparse.Namespace) -> int:
         args (argparse.Namespace): Parsed application arguments.
 
     Returns:
-        int: Computed result.
+        int: Process exit code returned by the Qt event loop.
     """
     if not has_qt():
         raise RuntimeError(
@@ -433,3 +433,4 @@ def run_pyside_gui(args: argparse.Namespace) -> int:
     if owns_app:
         return app.exec()
     return 0
+
