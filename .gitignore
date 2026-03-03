@@ -1,0 +1,6 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Local render outputs from CLI runs
+cpu-sdf-raymarch-output.png
