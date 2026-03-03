@@ -115,3 +115,15 @@ Notes:
 - GUI color rows show both formats for readability: `#RRGGBB (R, G, B)`.
 
 
+
+## Future Work
+
+- [ ] **Performance:** Profile the render loop and optimize the most expensive SDF/shading paths.
+- [ ] **Testing:** Add PNG snapshot regression tests to detect visual changes.
+- [ ] **Render Quality:** Improve shadows, AO, and material response with side-by-side comparisons.
+- [ ] **GUI Workflow:** Improve parameter tuning with better presets and clearer live feedback.
+
+## Acknowledgment
+
+This project started as a final task for the **Mathematics 1** course in the **Computer Graphics TD Track** of the **ITI Egypt 9-Month Intensive Program**.
+It was later extended as a personal practice project.
