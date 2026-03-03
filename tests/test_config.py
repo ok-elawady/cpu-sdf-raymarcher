@@ -1,7 +1,7 @@
 import pytest
 
-from renderer.app.config import parse_args
-from renderer.engine.constants import QUALITY_PRESETS
+from cpu_sdf_raymarcher.app.config import parse_args
+from cpu_sdf_raymarcher.engine.constants import QUALITY_PRESETS
 
 
 def test_parse_args_minimal_png_configuration() -> None:

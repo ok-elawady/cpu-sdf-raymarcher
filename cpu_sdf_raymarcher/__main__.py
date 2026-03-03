@@ -1,4 +1,4 @@
-"""Module entrypoint for `python -m renderer`."""
+"""Module entrypoint for `python -m cpu_sdf_raymarcher`."""
 
 from .app.cli import main
 

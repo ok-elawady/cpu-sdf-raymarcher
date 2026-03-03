@@ -1,6 +1,6 @@
 import pytest
 
-from renderer.common import color_utils as c
+from cpu_sdf_raymarcher.common import color_utils as c
 
 
 @pytest.mark.parametrize(

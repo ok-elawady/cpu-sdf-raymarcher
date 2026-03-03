@@ -6,8 +6,9 @@ This project is a CPU-based ray-marching renderer with a simple PySide6 GUI.
 
 ```text
 P2-3/
-  cpu_sdf_raymarcher.py   # root launcher
-  renderer/               # app package
+  launch_gui.bat         # main launcher (creates venv, installs deps, opens GUI)
+  run_app.py              # optional compatibility launcher
+  cpu_sdf_raymarcher/     # app package
     __init__.py
     __main__.py
     app/
@@ -28,6 +29,8 @@ P2-3/
     images/
       P2-3-GUI.png
       P2-3-output.png
+  tests/
+  pytest.ini
   requirements.txt
   README.md
 ```
@@ -37,32 +40,37 @@ P2-3/
 - Python 3.10+ (recommended)
 - Dependencies from `requirements.txt`
 
-## Setup
-
-```powershell
-pip install -r requirements.txt
-```
-
 ## Run
 
-Default (opens GUI):
+Main way (recommended):
 
 ```powershell
-python cpu_sdf_raymarcher.py
-# or
-python -m renderer
+.\launch_gui.bat
 ```
 
-Command-line render example:
+What this does:
+- Creates `.venv` if missing
+- Installs `requirements.txt`
+- Launches the GUI
+
+Alternative launch methods:
 
 ```powershell
-python cpu_sdf_raymarcher.py --quality balanced --width 960 --height 540 --output render.png --sphere-color "#FF7755" --box-color "90,170,220"
+python run_app.py --gui
+# or
+python -m cpu_sdf_raymarcher --gui
+```
+
+Command-line render example (PNG only):
+
+```powershell
+python -m cpu_sdf_raymarcher --quality balanced --width 960 --height 540 --output render.png --sphere-color "#FF7755" --box-color "90,170,220"
 ```
 
 Parallel render example (auto cores):
 
 ```powershell
-python cpu_sdf_raymarcher.py --quality high --workers 0 --output render-fast.png
+python -m cpu_sdf_raymarcher --quality high --workers 0 --output render-fast.png
 ```
 
 ## CLI Options
@@ -86,6 +94,16 @@ python cpu_sdf_raymarcher.py --quality high --workers 0 --output render-fast.png
 --gui
 --no-progress
 ```
+
+## Screenshots
+
+GUI:
+
+![GUI Screenshot](docs/images/P2-3-GUI.png)
+
+Rendered output:
+
+![Render Output](docs/images/P2-3-output.png)
 
 Notes:
 - Running with no arguments opens the GUI by default.

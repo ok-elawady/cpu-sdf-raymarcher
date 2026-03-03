@@ -2,8 +2,8 @@ from pathlib import Path
 
 import pytest
 
-from renderer.app.config import parse_args
-from renderer.engine.core import render_image, resolve_worker_count, write_image
+from cpu_sdf_raymarcher.app.config import parse_args
+from cpu_sdf_raymarcher.engine.core import render_image, resolve_worker_count, write_image
 
 
 def _build_args(output_path: Path, width: int = 10, height: int = 6):

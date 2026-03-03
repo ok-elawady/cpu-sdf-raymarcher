@@ -1,6 +1,6 @@
 import pytest
 
-from renderer.common import math_utils as m
+from cpu_sdf_raymarcher.common import math_utils as m
 
 
 def test_add_sub_mul() -> None:

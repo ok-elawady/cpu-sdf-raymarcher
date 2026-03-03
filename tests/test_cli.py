@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from renderer.app.cli import main
+from cpu_sdf_raymarcher.app.cli import main
 
 
 def test_cli_main_renders_png_and_prints_summary(
